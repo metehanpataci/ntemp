@@ -1,0 +1,70 @@
+# Delphi / RAD Studio
+
+# Binaries
+*.exe
+*.dll
+*.bpl
+*.dcp
+*.so
+*.dylib
+*.a
+*.lib
+*.ocx
+
+# Packages
+*.dproj.local
+*.dproj.bak
+*.dproj.~*
+*.identcache
+*.local
+*.deployproj
+*.tvsconfig
+
+# Generated files
+*.dcu
+*.dcp
+*.dres
+*.rsm
+*.drc
+*.map
+*.hpp
+*.obj
+*.tds
+*.bak
+*.tmp
+
+# Delphi IDE
+__history/
+__recovery/
+*.stat
+*.identcache
+*.local
+*.ipch
+*.pch
+
+# Autosave files
+*.~*
+*.#*
+
+# Debug/Release folders
+Win32/Debug/
+Win32/Release/
+Win64/Debug/
+Win64/Release/
+OSX32/Debug/
+OSX32/Release/
+iOSDevice32/Debug/
+iOSDevice32/Release/
+iOSSimulator/Debug/
+iOSSimulator/Release/
+Android/Debug/
+Android/Release/
+
+# Logs
+*.log
+
+# Other cache
+*.tvsconfig
+*.dsk
+*.cfg
+*.env
