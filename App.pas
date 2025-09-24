@@ -3,7 +3,7 @@
 interface
 
 uses
-  Vcl.Forms, Unit1;
+  Vcl.Forms, MainForm, MQTTClient;
 
   //UMainForm
 
@@ -17,14 +17,20 @@ implementation
 /// <param name="Value">Some integer value.</param>
 procedure Main;
 var
-  MyForm: TTestForm;
+  MasterForm: TMainForm; MqttCl: TMqttClient;
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+
   //Application.CreateForm(TMainForm, MainForm);
-MyForm := TTestForm.Create(nil);
-MyForm.Show;
-Application.Run;
+  Application.CreateForm(TMainForm, MasterForm);
+
+  MqttCl := TMqttClient.Create;
+  MasterForm.MQTTCl := MqttCl;
+  MqttCl.SubscribeObserver(MasterForm);
+
+  //MyForm.Show;
+  Application.Run;
 end;
 
 end.

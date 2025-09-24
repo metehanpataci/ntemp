@@ -1,21 +1,24 @@
-﻿unit uMQTTClient;
+﻿unit MQTTClient;
 
 interface
 
 uses
-  System.SysUtils, System.Classes,
-  OverbyteIcsMQTT, uNTempData;  // ICS 9.5
+  System.SysUtils, System.Classes,System.Generics.Collections,System.IOUtils,System.SyncObjs,
+  OverbyteIcsMQTT, uNTempData, Observable, Observer;  // ICS 9.5
 
 type
   TOnDeviceData = procedure(Sender: TObject; Data: TNTempData) of object;
 
-  TMqttClient = class
+  TMqttClient = class(TInterfacedObject,IObservable)
   private
+    FCritical: TCriticalSection;
+    private Observers : TList<IObserver>;
     FMqtt: TIcsMQTTClient;
     FOnDeviceData: TOnDeviceData;
     procedure HandleOnline(Sender: TObject);
     procedure HandleOffline(Sender: TObject; Graceful: Boolean);
     procedure HandleMsg(Sender: TObject; aTopic: UTF8String; const aMessage: AnsiString; aQos: TMQTTQOSType; aRetained: Boolean);
+    procedure LogMessage(const Msg: string);
   public
     constructor Create;
     destructor Destroy; override;
@@ -23,7 +26,11 @@ type
     procedure Connect(const AHost: string; APort: Integer; const AClientID: string = '');
     procedure Subscribe(const ATopic: string);
     procedure Disconnect;
+    procedure SubscribeObserver(obs:IObserver);
+
     property OnDeviceData: TOnDeviceData read FOnDeviceData write FOnDeviceData;
+
+
   end;
 
 
@@ -38,6 +45,9 @@ implementation
 constructor TMqttClient.Create;
 begin
   inherited;
+  FCritical := TCriticalSection.Create;
+
+  observers := TList<IObserver>.Create();
   FMqtt := TIcsMQTTClient.Create(nil);
 
   FMqtt.OnOnline := HandleOnline;
@@ -58,6 +68,8 @@ end;
 destructor TMqttClient.Destroy;
 begin
   FMqtt.Free;
+  observers.Free;
+  FCritical.Free;
   inherited;
 end;
 
@@ -96,7 +108,8 @@ end;
 }
 procedure TMqttClient.HandleOnline(Sender: TObject);
 begin
-  Writeln('MQTT Connected');
+  //Writeln('MQTT Connected');
+  LogMessage('MQTT online');
 end;
 
 {
@@ -108,9 +121,15 @@ end;
 procedure TMqttClient.HandleOffline(Sender: TObject; Graceful: Boolean);
 begin
   if Graceful then
-    Writeln('MQTT disconnected gracefully.')
+  begin
+   LogMessage('MQTT disconnected gracefully.');
+    //Writeln('MQTT disconnected gracefully.')
+  end
   else
-    Writeln('MQTT disconnected unexpectedly!');
+  begin
+    LogMessage('MQTT disconnected unexpectedly!');
+    //Writeln('MQTT disconnected unexpectedly!');
+  end;
 end;
 
 
@@ -122,11 +141,23 @@ end;
 }
 procedure TMqttClient.HandleMsg(Sender: TObject; aTopic: UTF8String; const aMessage: AnsiString;
   aQos: TMQTTQOSType; aRetained: Boolean);
+var i:Integer;
 begin
-  Writeln('Topic: ' + string(aTopic));
-  Writeln('Message: ' + string(aMessage));
-  Writeln('QoS: ' + Ord(aQos).ToString);
-  Writeln('Retained: ' + BoolToStr(aRetained, True));
+//Writeln('Topic: ' + string(aTopic));
+//Writeln('Message: ' + string(aMessage));
+//Writeln('QoS: ' + Ord(aQos).ToString);
+//Writeln('Retained: ' + BoolToStr(aRetained, True));
+FCritical.Enter;
+for i := 0 to Observers.Count - 1 do
+begin
+  TThread.Queue(nil,
+  procedure
+  begin
+       Observers[i].HandleMsg(aTopic, aMessage);
+  end);
+
+end;
+FCritical.Leave;
 end;
 
 
@@ -140,5 +171,22 @@ procedure TMqttClient.Subscribe(const ATopic: string);
 begin
   FMqtt.Subscribe(UTF8String(ATopic), qtAT_MOST_ONCE);
 end;
+
+
+/// <summary>
+///
+/// </summary>
+/// <param name="Sender"></param>
+procedure TMqttClient.SubscribeObserver(obs:IObserver);
+begin
+
+
+end;
+
+procedure TMqttClient.LogMessage(const Msg: string);
+begin
+  TFile.AppendAllText('C:\Users\MEP\repositories\projects\DELPHI\neurolux\nTemp\mqtt.log', FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + ' - ' + Msg + sLineBreak, TEncoding.UTF8);
+end;
+
 
 end.
