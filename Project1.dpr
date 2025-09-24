@@ -3,11 +3,11 @@ program Project1;
 uses
   Vcl.Forms,
   uNTempData in 'uNTempData.pas',
-  uMQTTClient in 'uMQTTClient.pas',
+  MQTTClient in 'MQTTClient.pas',
   App in 'App.pas',
-  Unit1 in 'Unit1.pas',
-  MainForm in 'MainForm.pas',
-  Observer in 'Observer.pas';
+  MainForm in 'MainForm.pas' {TMainForm},
+  Observer in 'Observer.pas',
+  Observable in 'Observable.pas';
 
 {$R *.res}
 

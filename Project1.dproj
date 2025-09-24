@@ -124,13 +124,13 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="uNTempData.pas"/>
-        <DCCReference Include="uMQTTClient.pas"/>
+        <DCCReference Include="MQTTClient.pas"/>
         <DCCReference Include="App.pas"/>
-        <DCCReference Include="Unit1.pas"/>
         <DCCReference Include="MainForm.pas">
             <Form>TMainForm</Form>
         </DCCReference>
         <DCCReference Include="Observer.pas"/>
+        <DCCReference Include="Observable.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

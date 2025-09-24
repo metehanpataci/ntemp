@@ -11,6 +11,7 @@ type
 
   TMqttClient = class(TInterfacedObject,IObservable)
   private
+    FTopic: string;
     FCritical: TCriticalSection;
     private Observers : TList<IObserver>;
     FMqtt: TIcsMQTTClient;
@@ -23,12 +24,15 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure Connect(const AHost: string; APort: Integer; const AClientID: string = '');
+    procedure Connect(const AHost: string; APort: Integer; const AClientID: string = '';ATopic: string = '');
     procedure Subscribe(const ATopic: string);
+    procedure Publish(const ATopic, AMessage: string; AQoS: TMQTTQOSType = qtAT_MOST_ONCE; ARetained: Boolean = False);
     procedure Disconnect;
     procedure SubscribeObserver(obs:IObserver);
 
+
     property OnDeviceData: TOnDeviceData read FOnDeviceData write FOnDeviceData;
+    function Online : boolean;
 
 
   end;
@@ -79,8 +83,9 @@ end;
   Parameters:
   Returns: Nothing
 }
-procedure TMqttClient.Connect(const AHost: string; APort: Integer; const AClientID: string);
+procedure TMqttClient.Connect(const AHost: string; APort: Integer; const AClientID: string;ATopic: string);
 begin
+  FTopic:=ATopic;
   FMqtt.Host := AHost;
   FMqtt.Port := APort;
   if AClientID <> '' then
@@ -110,6 +115,7 @@ procedure TMqttClient.HandleOnline(Sender: TObject);
 begin
   //Writeln('MQTT Connected');
   LogMessage('MQTT online');
+  FMqtt.Subscribe(FTopic, qtAT_MOST_ONCE); // burada subscribe ediyoruz
 end;
 
 {
@@ -147,6 +153,7 @@ begin
 //Writeln('Message: ' + string(aMessage));
 //Writeln('QoS: ' + Ord(aQos).ToString);
 //Writeln('Retained: ' + BoolToStr(aRetained, True));
+LogMessage(aMessage);
 FCritical.Enter;
 for i := 0 to Observers.Count - 1 do
 begin
@@ -179,8 +186,23 @@ end;
 /// <param name="Sender"></param>
 procedure TMqttClient.SubscribeObserver(obs:IObserver);
 begin
+   Observers.Add(obs);
+end;
 
 
+/// <summary>
+///
+/// </summary>
+/// <param name=""></param>
+procedure TMqttClient.Publish(const ATopic, AMessage: string; AQoS: TMQTTQOSType; ARetained: Boolean);
+begin
+  if FMqtt.Online then
+  begin
+    FMqtt.Publish(UTF8String(ATopic), UTF8String(AMessage), AQoS, ARetained);
+    LogMessage('Published: ' + ATopic + ' -> ' + AMessage);
+  end
+  else
+    LogMessage('Cannot publish, MQTT not connected');
 end;
 
 procedure TMqttClient.LogMessage(const Msg: string);
@@ -188,5 +210,14 @@ begin
   TFile.AppendAllText('C:\Users\MEP\repositories\projects\DELPHI\neurolux\nTemp\mqtt.log', FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + ' - ' + Msg + sLineBreak, TEncoding.UTF8);
 end;
 
+
+/// <summary>
+///
+/// </summary>
+/// <param name=""></param>
+function TMqttClient.Online : boolean;
+begin
+  Result:=FMqtt.Online;
+end;
 
 end.
