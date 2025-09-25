@@ -1,8 +1,8 @@
-program Project1;
+program PhenomasterMVP;
 
 uses
   Vcl.Forms,
-  uNTempData in 'uNTempData.pas',
+  NTempData in 'NTempData.pas',
   MQTTClient in 'MQTTClient.pas',
   App in 'App.pas',
   MainForm in 'MainForm.pas' {TMainForm},
