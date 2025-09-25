@@ -94,3 +94,7 @@ A `TNTempData` JSON object looks like this:
     "charging": true
   }
 }
+
+
+<img width="689" height="315" alt="image" src="https://github.com/user-attachments/assets/fe0d6eb0-64f3-4048-8e30-e907d881ded7" />
+
