@@ -11,6 +11,7 @@ object MainForm: TMainForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnResize = FormResize
   TextHeight = 15
   object MainPanel: TPanel
@@ -43,7 +44,7 @@ object MainForm: TMainForm
         end
         item
           Column = 0
-          Control = StatusLabel
+          Control = StatusPanel
           Row = 2
         end>
       RowCollection = <
@@ -57,11 +58,9 @@ object MainForm: TMainForm
         item
           SizeStyle = ssAbsolute
           Value = 24.000000000000000000
-        end
-        item
-          SizeStyle = ssAuto
         end>
       TabOrder = 0
+      ExplicitLeft = 2
       object ConfigGroupBox: TGroupBox
         AlignWithMargins = True
         Left = 4
@@ -189,14 +188,45 @@ object MainForm: TMainForm
           997
           64)
       end
-      object StatusLabel: TLabel
+      object StatusPanel: TPanel
         Left = 1
         Top = 678
-        Width = 3
+        Width = 1108
         Height = 24
-        Align = alLeft
-        Layout = tlCenter
-        ExplicitHeight = 15
+        Align = alClient
+        TabOrder = 2
+        ExplicitLeft = 640
+        ExplicitTop = 680
+        ExplicitWidth = 185
+        ExplicitHeight = 41
+        object StatusLabel: TLabel
+          Left = 1
+          Top = 1
+          Width = 3
+          Height = 22
+          Align = alLeft
+          Layout = tlCenter
+          ExplicitLeft = 16
+          ExplicitTop = 6
+          ExplicitHeight = 15
+        end
+        object ClearLabel: TLabel
+          AlignWithMargins = True
+          Left = 1056
+          Top = 4
+          Width = 43
+          Height = 16
+          Margins.Right = 8
+          Align = alRight
+          Caption = 'Clear'
+          Color = clGreen
+          ParentColor = False
+          Layout = tlCenter
+          OnClick = ClearLabelClick
+          ExplicitLeft = 1064
+          ExplicitTop = 1
+          ExplicitHeight = 22
+        end
       end
     end
   end
